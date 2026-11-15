@@ -1,0 +1,16 @@
+# Python virtual environment
+ec-venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# Environment variables
+.env
+.env.*
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Raw datasets
+data/bronze/

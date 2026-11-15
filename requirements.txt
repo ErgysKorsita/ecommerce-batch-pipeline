@@ -1,0 +1,18 @@
+# Data processing
+pandas
+numpy
+pyarrow
+
+# PostgreSQL
+sqlalchemy
+psycopg2-binary
+
+# Environment variables
+python-dotenv
+
+# Jupyter notebooks
+jupyter
+ipykernel
+
+# Testing
+pytest

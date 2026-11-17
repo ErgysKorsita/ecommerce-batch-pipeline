@@ -149,3 +149,53 @@
 - **Impact** - No negative-value anomalies were identified. 
 - **Action** - No action required.
 - **Status** - No cleaning required.
+
+# 4. Sellers
+
+### Finding 001 - Consistent column naming
+
+- **Observation** - No spelling mistakes were identified in the column names.
+- **Cause** - Column names appear correctly defined in the source dataset.
+- **Impact** - No naming incosnsistencies were identified. 
+- **Action** - No action required.
+- **Status** - No cleaning required.
+
+### Finding 002 - Missing Leading Zeros in ZIP codes
+
+- **Observation** - Some seller_zip_code_prefix value appear to be missing leading zeros, consistent with the customer table.
+- **Cause** - ZIP codes may have been interpreted as numeric values instead of strings.
+- **Impact** - May cause inconsistencies when joining location data or performing geographical analysis.
+- **Action** - Investigate the raw values and preserve ZIP code prefixes as five-character strings, restoriong leading zeros where appropriate.
+- **Status** - Cleaning required where leading zeros were lost.
+
+### Finding 003 - No missing values
+
+- **Observation** - No null values were found in any columns.
+- **Cause** - All sellers records contain values for the available fields.
+- **Impact** - No null-value handling is required based on the current checks.
+- **Action** - No action required. 
+- **Status** - No action required.
+
+### Finding 004 - Unique Seller Identifiers 
+
+- **Observation** - No duplicate seller_id values were found.
+- **Cause** - Each seller is represented by a unique identifier.
+- **Impact** - seller_id can be used as the primary key for the sellers table.
+- **Action** - Preserve uniqueness during data processing.
+- **Status** - Expected behaviour - no cleaning required.
+
+### Finding 005 - Valid Seller State Codes
+
+- **Observation** - No unexpected or invalid state codes were identified in seller_state.
+- **Cause** - Seller state values appear consistent with brazilian state codes.
+- **Impact** - No state-code inconsistencies were identified that could affect geographical analysis.
+- **Action** - No action required.
+- **Status** - No action required.
+
+### Finding 006 - No duplicated rows 
+
+- **Observation** - No fully duplicated rows were found.
+- **Cause** - Each row represents a distinct seller record.
+- **Impact** - No duplicated records need to be removed.
+- **Action** - No action required.
+- **Status** - No action required.

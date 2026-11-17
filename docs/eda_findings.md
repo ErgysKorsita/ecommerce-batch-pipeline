@@ -98,3 +98,54 @@
 - **Impact** - Enables shipping-duration calculations, chronological validation and delivery performance analysis. 
 - **Action** - Use the appropriate timestamps for each metric and compare calendar dates when evaluating delivery deadlines. 
 - **Status** - Expected behavior - no cleaning required. 
+
+## 3. Products
+
+### Finding 001 - Misspelled Column name 
+
+- **Observation** - A spelling mistake was identified in product_name_lenght and product_description_lenght.
+- **Cause** - Likely a naming error in the source dataset.
+- **Impact** - May cause confusion or inconsistencies when referencing the column.
+- **Action** - Rename the column during the cleaning/transformation stage.
+- **Status** - Cleaning required. 
+
+### Finding 002 - Unique Product Identifiers
+
+- **Observation** - No duplicate product_id values were found.
+- **Cause** - Each product record has a unique identifier, even when multiple products belong to the same category.
+- **Impact** - product_id can be used as a unique key for the product table.
+- **Action** - Preserve uniqueness during data processing.
+- **Status** - Expected behavior - no cleaning required. 
+
+### Finding 003 - No duplicate rows 
+
+- **Observation** - No fully duplicated rows were found.
+- **Cause** - Each row represents a distinct product record.
+- **Impact** - No duplicate records need to be removed.
+- **Action** - No action required. 
+- **Status** - No cleaning required.
+
+### Finding 004 - Missing product information
+
+- **Observation** - No missing values in product_id. However, 610 missing values were found in each of product_category_name, product_name_length, product_description_length, and product_photos_qty. Additionally, 2 missing values were found in each of product_weight_g, product_length_cm, product_height_cm, and product_width_cm.
+- **Cause** - Unknown; possibly incomplete product information.
+- **Impact** - May affect category-based analytics and calculations involving product dimensions.
+- **Action** - Investigate whether missing values occur in the same records and determine an appropriate handling strategy.
+- **Status** - Further investigation required. 
+
+### Finding 005 - Repeated Product Categories
+
+- **Observation** - Multiple products share the same product_category_name.
+- **Cause** - Different products can belong to the same category.
+- **Impact** - product_category_name is not a unique identifier and should not be used as a primary key.
+- **Action** - Use product_id for product identification.
+- **Status** - Expected behavior - no cleaning required.
+
+
+### Finding 006 - No negative numeric values
+
+- **Observation** - No negative values were found in the numeric columns checked.
+- **Cause** - Numeric values are non-negative in the inspected records.
+- **Impact** - No negative-value anomalies were identified. 
+- **Action** - No action required.
+- **Status** - No cleaning required.

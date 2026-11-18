@@ -288,4 +288,87 @@
 - **Cause** - Dates were loaded from CSV as strings.
 - **Impact** - Date-based operations require conversion to an appropriate datetime type.
 - **Action** - Convert shipping_limit_date to a timestamp during Silver-layer transformations.
-- **Status** - validated; conversion pending in Silver layer.
+- **Status** - Validated; conversion pending in Silver layer.
+
+# 6. Order Payment 
+
+### Finding 001 - Repeated Order Identifiers 
+
+- **Observation** -  Duplicate order_id values exist, but not fully duplicated rows were found.
+- **Cause** - An order can have multiple payment records, potentially involving different payment methods.
+- **Impact** - order_id can link payments to other tables but cannot uniquely identify individual payment methods.
+- **Action** - Preserve repeated order identifiers and account for multiple payments when performing order-level aggregations.
+- **Status** - Expected behavior, no cleaning required.
+
+### Finding 002 - Undefined Payment Types
+
+- **Observation** -  The payment_type column contains records classified as not_defined
+- **Cause** - Unknown, payment methods may be missing, unspecified or incorrectly classified.
+- **Impact** - Could affect payment method analysis and reporting accuracy.
+- **Action** - Investigate the frequency and characteristics of not_defined payments.
+- **Status** - Further investigation required. 
+
+### Finding 003 - Zero Payment Values
+
+- **Observation** - No missing or negative payment_value values were found. However, 9 records have a value of zero. The maximum is 13,663.08, with a mean of 154.10 and a median of 100.00. 
+- **Cause** - Unknown, zero-value payments may represent special transactions or data-quality issues.
+- **Impact** - Could affect payments and revenue calculations. 
+- **Action** - Investigate the 9 zero-value records and determine whether they represent legitimate transactions.
+- **Status** - Further investigation required.
+
+### Finding 004 - Zero Payment Installments
+
+- **Observation** -  No missing or negative payment_installments values were found. However, 2 records have zero installments. The maximum is 24.00, with a mean of 2.85 and a median of 1.00.
+- **Cause** - Unknown, zero installments may represent may represent exceptional payment conditions or inconsistent records.
+- **Impact** - Could affect installment-based payment analysis.
+- **Action** - Investigate the 2 records with zero installments and their associated payment method.
+- **Status** - Further investigation is required.
+
+### Finding 005 - Payment Sequence Characteristics 
+
+- **Observation** -  payment_sequential contains no missing, negative or zero values. Values range from 1 to 29, with a mean of 1.09 and median of 1.00. One investigation order contains 29 voucher payments and one additional payment record.
+- **Cause** - Orders can contain multiple payment records, including combinations of vouchers and other payment methods.
+- **Impact** - Payment sequences represent separate payment entries and should not be confused with payment installments. 
+- **Action** - Preserve valid payment sequences and account for multiple records per order. 
+- **Status** - Expected behavior - no cleaning required for valid sequences.
+
+### Finding 006 - Invalid Payment Sequences 
+
+- **Observation** -  80 orders have payment sequences starting at 2 instead of 1. Of these, 78 orders contains only sequence 2, while 2 orders contain sequences 2 and 3.
+- **Cause** - Unknown, potentially missing initial payment records or inconsistency assigned sequence numbers.
+- **Impact** - May affect payment sequence integrity and the interpretation of payment records within an order.
+- **Action** - Investigate the affected orders during data cleaning and validation to determine whether payment records are missing or sequence numbers were incorrectly assigned.
+- **Status** - Further investigation required. 
+
+### Finding 007 - Payment Value Outliers
+
+- **Observation** -  The IQR method identified 7,981 outlier records in payment_value. The maximum payment value is 13,664.08, considerably higher than the median of 100.00.
+- **Cause** - May reflect legitimate high-value transactions or unusual payment records.
+- **Impact** - Extreme values may influence statistical summaries and financial analysis.
+- **Action** - Preserve the records initially and investigate extreme values during transformation or subsequent analysis.
+- **Status** - Flagged for further investigation.
+
+### Finding 008 - Payment Sequence and Installment Outliers
+
+- **Observation** -  The IQR method identified 4,526 outlier records in payment_sequential and 6,331 in payment_installments.
+- **Cause** - Both columns contain discrete counts with distributions centered around1. Higher values can therefore fall outside the IQR boundaries.
+- **Impact** - Statistical outliers do not necessarily indicate invalid payment sequences or installment counts.
+- **Action** - Preserve the values unless additional validation identifiers actual inconsistencies. Prioritize business-rule validation over IQR thresholds.
+- **Status** - Statistical outliers identified - no automatic cleaning required.
+
+### Finding 009 - Data completeness and Structure
+
+- **Observation** -  No missing values, fully duplicated rows or spelling mistakes in column names were identified.
+- **Cause** - No structural issues detected during preliminary checks.
+- **Impact** - No immediate cleaning is required for missing values, duplicate rows or column naming.
+- **Action** - Preserve the existing structure and continue with targeted data-quality checks.
+- **Status** - Validated - no cleaning required.
+
+### Finding 010 - Cross-Table Payment Validation
+
+- **Observation** -  Multiple payment records can belong to the same order, requiring aggregation before comparison with order-item totals.
+- **Cause** - The payments and order-items tables represent different levels of detail.
+- **Impact** - Direct joins may multiply records and produce incorrect financial aggregates.
+- **Action** - During transformation and validation, compare total payments per order against aggregated product prices and shipping costs.
+- **Status** - Deferred to transformation and data-quality validation phase.
+

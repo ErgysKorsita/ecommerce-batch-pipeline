@@ -421,3 +421,45 @@
 - **Impact** - The table supports integration with other datasets, subject to investigation of repeated identifiers.
 - **Action** - Use order_id for joins after examining duplicated identifiers.
 - **Status** - partially validated - identifier investigation pending.
+
+# 8 Geo-location
+
+### Review 001 - Missing Leading Zeros in ZIP Code Prefixes 
+
+- **Observation** -  245,733 records contain 4-digit ZIP code prefixes instead of the expected 5 digits. The remaining 754,430 records contain 5-digit prefixes.
+- **Cause** - Leading zeros were likely removed because ZIP code prefixes were interpreted as numeric values.
+- **Impact** - Inconsistent ZIP code formatting could affect joins with the customers and sellers tables.
+- **Action** - Convert geolocation_zip_code_prefix to string and apply .str.zfill(5) during transformation.
+- **Status** - Cleaning required.
+
+### Review 002 - Valid State Distribution
+
+- **Observation** -  The dataset contains 27 distinct state codes, matching Brazil;s 26 states and Federal District.
+- **Cause** - The dataset includes all expected Brazilian federal units.
+- **Impact** - State-level geographical analysis is supported.
+- **Action** - No cleaning required based on the state count.
+- **Status** - Expected behavior.
+
+### Review 003 - Coordinates Outside Brazil's Approximate Boundaries
+
+- **Observation** -  42 records contain coordinates outside Brazil's approximate geographical bounding box. All coordinates fall within globally valid latitude and longitude ranges.
+- **Cause** - Not yet determined. Possible causes include incorrect coordinates ot geo-location mapping error.
+- **Impact** - These records could distort geographical analysis and location-based visualizations. 
+- **Action** - Investigate the 42 records before deciding whether to correct, exclude or retain them.
+- **Status** - Further investigation required.
+
+### Review 004 - Data Completeness and Column Naming
+
+- **Observation** -  No missing values or spelling mistakes in column names were detected.
+- **Cause** - No apparent completeness or column naming issues.
+- **Impact** - No additional cleaning is required for missing values or column names.  
+- **Action** - No action required.
+- **Status** - Validated - no issues detected.
+
+### Review 005 - Repeated Geo-location ZIP Code Prefixes
+
+- **Observation** - Approximately 19,000 unique ZIP code prefixes exist across 1 million records. Multiple records share the same prefix. 
+- **Cause** - A ZIP coded prefix can be associated with multiple geographical coordinates.
+- **Impact** - Direct joins with customers or sellers could multiply records and distort analytical results.
+- **Action** - Create a geo-location lookup table containing one representative coordinate pair per ZIP code prefix during transformation.
+- **Status** - Expected repetition - transformation required before joining.

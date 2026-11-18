@@ -3,11 +3,11 @@
 ## 1. Customers
 ### Finding 001 - Repeated Customer Identifiers 
 
-- **Observation** - Over 3000 repeated occurrances of customer_unique_id.
+- **Observation** - Over 3000 repeated occurrences of customer_unique_id.
 - **Cause** - Customers can place multiple orders.
 - **Impact** - customer_id and customer_unique_id serve different purposes.
-- **Action** - Use customer_unqiue_id for customer-level analytics.
-- **Status** - Expected behaviour - no cleaning required.
+- **Action** - Use customer_unique_id for customer-level analytics.
+- **Status** - Expected behavior - no cleaning required.
 
 ### Finding 002 - Customer Identifiers & Duplicates
 
@@ -15,14 +15,14 @@
 - **Cause** - The same customer can place multiple orders, each associated with a different customer_id. 
 - **Impact** - Using customer_id for customer_level analytics could overestimate the number of unique customers. 
 - **Action** - Use customer_unique_id for customer-level analytics and customer_id for joining with orders table.
-- **Status** - Expected behaviour - no cleaning required.
+- **Status** - Expected behavior - no cleaning required.
 
 ### Finding 003 - Zip Code Leading Zeros
 
-- **Observation** - 23,995 ZIP code prefixes apper as 4-digit values instead of 5-digit values. 
+- **Observation** - 23,995 ZIP code prefixes appear as 4-digit values instead of 5-digit values. 
 - **Cause** - Likely caused by pandas interpreting ZIP codes as integers.
-- **Impact** - Ptential mismatches when joining with geolocation data.
-- **Action** - Read ZIP code prefixes as strings and valiudate their length.
+- **Impact** - Potential mismatches when joining with geo-location data.
+- **Action** - Read ZIP code prefixes as strings and validate their length.
 - **Status** - Pending validation against source CSV.
 
 ## 2. Orders
@@ -39,7 +39,7 @@
 
 - **Observation** - Date columns are stored as strings rather than than timestamps.
 - **Cause** - CSV files do not preserve native datetime data types. 
-- **Impact** - Date comparisons and time-based calculations require converstion.
+- **Impact** - Date comparisons and time-based calculations require conversation.
 - **Action** - Convert date columns to timestamps in the Silver layer.
 - **Status** - Transformation required.
 
@@ -61,7 +61,7 @@
 
 ### Finding 005 - Chronological Inconsistencies
 
-- **Observation** - No invalid approval dates were found. However, 680 carrier handoff timestamps occur before approval timestamps and 20 customer delivery timestamps ocurr before carrier handoff timestamps.
+- **Observation** - No invalid approval dates were found. However, 680 carrier handoff timestamps occur before approval timestamps and 20 customer delivery timestamps occur before carrier handoff timestamps.
 - **Cause** - Potential timestamp recording errors, delayed system updates or operation differences.
 - **Impact** - May affect order-processing duration and shipping performance calculations. 
 - **Action** - Investigate affected records and define chronological validation rules in the Silver layer.
@@ -78,7 +78,7 @@
 ### Finding 007 - Repeated Carrier Handoff Timestamps
 
 - **Observation** - 18,422 duplicate occurrences were identified in order_delivered_carrier_date, including 1,782 repeated missing timestamps. The remaining 16,640 are repeated non-null timestamps.
-- **Cause** - Possible batch processing, scheduled carrier pickups, or simulataneous system updates. Missing values might come to order not being in curriers possesion yet.
+- **Cause** - Possible batch processing, scheduled carrier pickups, or simultaneous system updates. Missing values might come to order not being in curriers possession yet.
 - **Impact** - Repeated timestamps do not necessarily indicate duplicated orders or invalid records.
 - **Action** - Preserve repeated timestamps and investigate their frequency if necessary.
 - **Status** - Potentially expected behavior - no immediate cleaning required.
@@ -86,7 +86,7 @@
 ### Finding 008 - Customer Delivery Timestamps
 
 - **Observation** - 812 repeated non-null timestamps and 2,965 missing values were identified in order_delivered_customer_date. 
-- **Cause** - Repeated timestamps may reflect coinciding delivery or recording times. Missing valyes may relate to orders that were not delivered. 
+- **Cause** - Repeated timestamps may reflect coinciding delivery or recording times. Missing values may relate to orders that were not delivered. 
 - **Impact** - Missing timestamps limit delivery-time analysis, while repeated timestamps do not necessarily indicate errors.  
 - **Action** - Investigate missing delivery dates by order_status and preserve legitimate repeated timestamps. 
 - **Status** - Missing values require investigation; repeated timestamps require no immediate cleaning. 
@@ -156,7 +156,7 @@
 
 - **Observation** - No spelling mistakes were identified in the column names.
 - **Cause** - Column names appear correctly defined in the source dataset.
-- **Impact** - No naming incosnsistencies were identified. 
+- **Impact** - No naming inconsistencies were identified. 
 - **Action** - No action required.
 - **Status** - No cleaning required.
 
@@ -182,7 +182,7 @@
 - **Cause** - Each seller is represented by a unique identifier.
 - **Impact** - seller_id can be used as the primary key for the sellers table.
 - **Action** - Preserve uniqueness during data processing.
-- **Status** - Expected behaviour - no cleaning required.
+- **Status** - Expected behavior - no cleaning required.
 
 ### Finding 005 - Valid Seller State Codes
 
@@ -199,3 +199,77 @@
 - **Impact** - No duplicated records need to be removed.
 - **Action** - No action required.
 - **Status** - No action required.
+
+# 5. Order Items 
+
+### Finding 001 - Column Names and Data Types 
+
+- **Observation** - No spelling mistakes detected in column names. Shipping_limit_data is stored as a string.
+- **Cause** - Data values were imported from CSV without datetime conversion.
+- **Impact** - Date-based calculations and comparisons may require conversion.
+- **Action** - Converting shipping_limit_date to a timestamp during Silver-layer transformations.
+- **Status** - Cleaning required in Silver layer.
+
+### Finding 002 - Repeated Order Identifiers
+
+- **Observation** - order_id contains duplicate values but no missing values.
+- **Cause** - A single order can contain multiple items.
+- **Impact** - order_id cannot uniquely identify individual order items.
+- **Action** - Verify uniqueness of the composite key (order_id, order_item_id).
+- **Status** - Expected behavior, composite key validation pending.
+
+### Finding 003 - Data Completeness and Duplicates
+
+- **Observation** - No missing values across all seven columns and no fully duplicated rows. Repeated values exist in order_id, order_item_id, product_id and seller_id.
+- **Cause** - Orders can contain multiple items, while products and sellers can appear across different orders. Item numbering restarts for each order.
+- **Impact** - Individual column duplicates are expected and do not necessarily indicate duplicate records.
+- **Action** - Verify uniqueness of composite key (order_id, order_item_id).
+- **Status** - No missing-value cleaning required, composite key validation pending.
+
+### Finding 004 - Relationship between tables. 
+
+- **Observation** - order_id, product_id and seller_id are present and can be used to relate order_items to orders_products and sellers.
+- **Cause** - The dataset follows a relational structure.
+- **Impact** - Enables cross-table analysis of orders, products sellers and shipping costs.
+- **Action** - Validate relationships and referential integrity during Silver-layer development.
+- **Status** - Expected structure - validation pending.
+
+### Finding 005 - Price validation. 
+
+- **Observation** - No missing, negative or zero prices. Minimum price is R$0.85, maximum R$6.735.00, mean R$120.65 and median R$74.99.
+- **Cause** - Price vary across products.
+- **Impact** - No obvious invalid prices detected, although extreme values may affect aggregations.
+- **Action** - Preserve original values and investigate unusually high prices if necessary.
+- **Status** - No immediate cleaning required.
+
+### Finding 006 - Freight Value Validation
+
+- **Observation** - freight_value represents the shipping charge associated with an order_item. No missing or negative values were detected. there are 383 zero-freight records. Maximum freight is R$409.68 , mean is R$19.99 and median is R$ 16.26 .
+- **Cause** - Zero freight may represent free shipping; high values may reflect shipping requirements or product characteristics.
+- **Impact** - Unusual freight values may affect shipping-cost analytics.
+- **Action** - Preserve original values and investigate extreme freight charges.
+- **Status** - Further investigation required.
+
+### Finding 007 - Statistical Outliers
+
+- **Observation** - IQR analysis identified 8,427 potential outliers in price and 12,1234 in freight_value.
+- **Cause** - Potentially related to variation in product prices and shipping costs.
+- **Impact** - Extreme values may influence statistical summaries but are not necessarily errors.
+- **Action** - Preserve records and investigate relevant outliers during cross-table analysis.
+- **Status** - Further investigation required.
+
+### Finding 008 - Freight Costs Exceeding Product Prices
+
+- **Observation** - Multiple order items have freight_value greater than price.
+- **Cause** - Potentially related to product weight, dimensions, fragility or shipping distance.
+- **Impact** - High freight-to-price ratios may be legitimate but warrant investigation.
+- **Action** - Compare freight charges with product weight and dimensions from the products table during cross-table analysis.
+- **Status** - Further investigation required.
+
+### Finding 009 - Shipping Deadline Analysis
+
+- **Observation** - shipping_limit_date represents the shipping deadline and may be compared with dates in the orders table.
+- **Cause** - Shipping deadlines and order timestamps represent different stages of order fulfillment.
+- **Impact** - Cross-table comparisons may help identify unusual fulfillment timelines.
+- **Action** - Investigate shipping deadlines against relevant order timestamps after date conversion.
+- **Status** - Further investigation required in Silver layer.

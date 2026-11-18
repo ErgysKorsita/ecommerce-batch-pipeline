@@ -463,3 +463,22 @@
 - **Impact** - Direct joins with customers or sellers could multiply records and distort analytical results.
 - **Action** - Create a geo-location lookup table containing one representative coordinate pair per ZIP code prefix during transformation.
 - **Status** - Expected repetition - transformation required before joining.
+
+
+# 9. Product Category Name Translation
+
+### Finding 001 - Data Completeness and Integrity
+
+- **Observation** -  No missing values, duplicated category identifiers, fully duplicated rows or spelling mistakes in column names were detected.
+- **Cause** - No apparent structural or data quality issues.
+- **Impact** - The table appears suitable for use as a category translation lookup table.
+- **Action** - No cleaning required based on the checks performed.
+- **Status** - Validated - no issues detected.
+
+### Finding 002 - Missing Product Category Translations
+
+- **Observation** -  Two product categories (portateis_cozinha_e_preparadores_de_alimentos and pc_gamer) exist in the products table but have no corresponding entries in the category translation table.
+- **Cause** - The translation lookup table does not cover all categories present in the product database.
+- **Impact** - products belonging to these categories will not receive an English category name when joined with the translation table. An inner join could exclude these products entirely.
+- **Action** - Add the missing translations or implement a fallback strategy during Silver-layer transformation.
+- **Status** - Cleaning required - to be addressed during transformation.

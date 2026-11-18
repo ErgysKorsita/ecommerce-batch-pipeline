@@ -165,7 +165,7 @@
 - **Observation** - Some seller_zip_code_prefix value appear to be missing leading zeros, consistent with the customer table.
 - **Cause** - ZIP codes may have been interpreted as numeric values instead of strings.
 - **Impact** - May cause inconsistencies when joining location data or performing geographical analysis.
-- **Action** - Investigate the raw values and preserve ZIP code prefixes as five-character strings, restoriong leading zeros where appropriate.
+- **Action** - Investigate the raw values and preserve ZIP code prefixes as five-character strings, restoring leading zeros where appropriate.
 - **Status** - Cleaning required where leading zeros were lost.
 
 ### Finding 003 - No missing values
@@ -273,3 +273,19 @@
 - **Impact** - Cross-table comparisons may help identify unusual fulfillment timelines.
 - **Action** - Investigate shipping deadlines against relevant order timestamps after date conversion.
 - **Status** - Further investigation required in Silver layer.
+
+### Finding 010 - Composite Primary Key Uniqueness
+
+- **Observation** - No duplicate combinations of (order_od, order_item_id) were found.
+- **Cause** - Each item is uniquely numbered within its corresponding order.
+- **Impact** - The combination of these columns can serve as a composite primary key for the order_items table.
+- **Action** - Consider enforcing a composite primary key constraint during database modeling.
+- **Status** - Validated, no cleaning required.
+
+### Finding 011 - Shipping Deadline Date Validation
+
+- **Observation** - shipping_limit_date is stored as a string, but all values were successfully parsed as timestamps. No missing or invalid dates were detected. 
+- **Cause** - Dates were loaded from CSV as strings.
+- **Impact** - Date-based operations require conversion to an appropriate datetime type.
+- **Action** - Convert shipping_limit_date to a timestamp during Silver-layer transformations.
+- **Status** - validated; conversion pending in Silver layer.

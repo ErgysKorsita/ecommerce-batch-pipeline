@@ -372,3 +372,52 @@
 - **Action** - During transformation and validation, compare total payments per order against aggregated product prices and shipping costs.
 - **Status** - Deferred to transformation and data-quality validation phase.
 
+# 7 Order Reviews 
+
+### Finding 001 - Missing Review Comments 
+
+- **Observation** -  Missing values are present in review_comment_title and review_comment_messages. All other columns contain no missing values.
+- **Cause** - Review titles and messages are optional.
+- **Impact** - Text-based analysis will be limited to reviews containing written comments.
+- **Action** - Preserve missing values.
+- **Status** - Expected behavior - no cleaning required.
+
+### Finding 002 - Duplicated Review and order Identifiers
+
+- **Observation** -  Duplicated values are present in review_id and order_id. No fully duplicated rows were found.
+- **Cause** - Not yet determined.
+- **Impact** - Repeated identifiers could lead to incorrect joins and inflated review counts.
+- **Action** - Investigate duplicated identifiers to determine whether they represent legitimate records or data quality issues.
+- **Status** - Further investigation required.
+
+### Finding 003 - Incorrect Date Data Types
+
+- **Observation** -  review_creation_date and review_answer_timestamp are stored as strings.
+- **Cause** - Date columns were imported without datetime conversion.
+- **Impact** - Temporal analysis requires proper datetime data types.
+- **Action** - Convert both columns to datetime during transformations.
+- **Status** - Cleaning required.
+
+### Finding 004 - Review Score Distribution
+
+- **Observation** -  Most reviews have positive scores. All scores fall within the expected range of 1-5.
+- **Cause** - The observed distribution is concentrated toward higher ratings.
+- **Impact** - The distribution indicates predominantly positive customer feedback. 
+- **Action** - No cleaning required. review scores can be used for customer satisfaction analysis.
+- **Status** - Validated -  no invalid scores detected.
+
+### Finding 005 - Consistent Review Timestamps
+
+- **Observation** -  No chronological inconsistencies were detected between review-creation_date and review_answer_timestamp, including hours, minutes and seconds.
+- **Cause** - Review answer timestamps occur at or after review creation timestamps.
+- **Impact** - The chronological sequence is consistent and supports response-time analysis.
+- **Action** - No chronological corrections required.
+- **Status** - Validated - no inconsistencies detected.
+
+### Review 006 - Relational Structure and Data Integrity 
+
+- **Observation** -  order_id is present and can be used to link reviews to the orders table. No fully duplicated rows or spelling mistakes in column names were detected.
+- **Cause** - The dataset includes an order identifier and follows consistent column naming conventions.
+- **Impact** - The table supports integration with other datasets, subject to investigation of repeated identifiers.
+- **Action** - Use order_id for joins after examining duplicated identifiers.
+- **Status** - partially validated - identifier investigation pending.

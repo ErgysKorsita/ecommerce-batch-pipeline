@@ -4,6 +4,7 @@ ec-venv/
 # Python cache files
 __pycache__/
 *.pyc
+.pytest_cache/
 
 # Environment variables
 .env
@@ -14,3 +15,5 @@ __pycache__/
 
 # Raw datasets
 data/bronze/
+data/silver
+data/gold

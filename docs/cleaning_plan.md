@@ -19,10 +19,18 @@ Transform raw Bronze datasets into clean, consistent, and validated Silver datas
 
 | Issue | Planned Action | Status |
 |---|---|---|
-| ZIP code prefixes | Preserve as five-character strings with leading zeros | Pending |
-| Customer identifiers | Validate uniqueness of customer_id | Pending |
-| Repeated customer_unique_id | Preserve as expected behavior | Pending |
-| Missing values | Validate absence of unexpected nulls | Pending |
+| ZIP code prefixes | Preserve as five-character strings with leading zeros | Implemented |
+| Customer identifiers | Validate uniqueness of customer_id | Implemented |
+| Repeated customer_unique_id | Preserve as expected behavior | Implemented |
+| Missing values | Validate absence of unexpected nulls | Implemented |
+
+**Implementation progress**
+- Transformation: Implemented
+- Validation: Implemented
+- Unit tests: Passing
+- Silver Parquet output: Generated
+- Integration test: Pending
+
 
 ### 2. Orders
 

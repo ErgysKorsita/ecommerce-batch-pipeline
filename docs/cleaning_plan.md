@@ -29,12 +29,29 @@ Transform raw Bronze datasets into clean, consistent, and validated Silver datas
 - Validation: Implemented
 - Unit tests: Passing
 - Silver Parquet output: Generated
-- Integration test: Pending
+- Integration test: Passed
 
 
 ### 2. Orders
 
-To be defined.
+### 2. Orders
+
+| Issue | Planned Action | Status |
+|---|---|---|
+| Date columns stored as strings | Convert five date columns to datetime | Pending |
+| Order identifiers | Validate uniqueness and absence of nulls in `order_id` | Pending |
+| Customer identifiers | Validate absence of nulls in `customer_id`; preserve for joins | Pending |
+| Missing timestamps | Preserve expected nulls; investigate inconsistent missing values | Pending |
+| Invalid dates | Detect parsing failures without silently losing original information | Pending |
+| Date chronology | Validate chronological consistency of order events | Pending |
+| Order statuses | Preserve original statuses; investigate inconsistencies | Pending |
+
+**Implementation Progress**
+- Transformation: Pending
+- Validation: Pending
+- Unit tests: Pending
+- Silver Parquet output: Pending
+- Integration test: Pending
 
 ### 3. Order Items
 

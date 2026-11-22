@@ -2,7 +2,7 @@ from multiprocessing import Value
 import pandas as pd 
 import pytest 
 
-from src.transform import check_order_chronology, transform_orders, validate_orders
+from src.transform import check_order_chronology, check_order_status_timestamps, transform_orders, validate_orders
 
 
 def test_transform_orders_converts_dates():
@@ -209,3 +209,72 @@ def test_chronology_preserves_original():
 
     assert "chronology_issue" not in df.columns
     "chronology_issue" in result.columns
+
+def test_status_delivered_missing_timestamp():
+    df = pd.DataFrame({
+        "order_status": ["delivered"],
+        "order_delivered_customer_date": pd.to_datetime([None]),
+        "order_delivered_carrier_date": pd.to_datetime(["2018-05-14"])
+    })
+
+    result = check_order_status_timestamps(df)
+
+    assert result["status_timestamp_issue"].iloc[0] == True
+
+def test_status_delivered_valid_timestamp():
+    df = pd.DataFrame({
+        "order_status": ["delivered"],
+        "order_delivered_customer_date": pd.to_datetime(["2018-05-15"]),
+        "order_delivered_carrier_date": pd.to_datetime(["2018-05-14"])
+    })
+
+    result = check_order_status_timestamps(df)
+
+    assert result["status_timestamp_issue"].iloc[0] == False
+
+def test_status_canceled_missing_timestamp():
+    df = pd.DataFrame({
+        "order_status": ["canceled"],
+        "order_delivered_customer_date": pd.to_datetime([None]),
+        "order_delivered_customer_date": pd.to_datetime([None]),
+        "order_delivered_carrier_date": pd.to_datetime([None])
+    })
+
+    result = check_order_status_timestamps(df)
+
+    assert result["status_timestamp_issue"].iloc[0] == False
+
+def  test_status_shipped_missing_carrier_timestamp():
+    df = pd.DataFrame({
+        "order_status": ["shipped"],
+        "order_delivered_carrier_date": pd.to_datetime([None]),
+        "order_delivered_customer_date": pd.to_datetime([None]),
+        "order_delivered_customer_date": pd.to_datetime([None])
+    })
+
+    result = check_order_status_timestamps(df)
+
+    assert result["status_timestamp_issue"].iloc[0] == True
+
+def test_status_shipped_carrier_timestamp():
+    df = pd.DataFrame({
+        "order_status": ["shipped"],
+        "order_delivered_carrier_date": pd.to_datetime(["2018-05-15"]),
+        "order_delivered_customer_date": pd.to_datetime([None])
+    })
+
+    result = check_order_status_timestamps(df)
+
+    assert result["status_timestamp_issue"].iloc[0] == False
+
+def test_status_timestamps_preserves_original():
+    df = pd.DataFrame({
+        "order_status": ["delivered"],
+        "order_delivered_carrier_date": pd.to_datetime(["2018-05-14"]),
+        "order_delivered_customer_date": pd.to_datetime(["2018-05-15"])
+    })
+
+    result = check_order_status_timestamps(df)
+
+    assert "status_timestamp_issue" not in df.columns
+    assert "status_timestamp_issue" in result.columns

@@ -34,24 +34,61 @@ Transform raw Bronze datasets into clean, consistent, and validated Silver datas
 
 ### 2. Orders
 
-### 2. Orders
-
 | Issue | Planned Action | Status |
 |---|---|---|
-| Date columns stored as strings | Convert five date columns to datetime | Pending |
-| Order identifiers | Validate uniqueness and absence of nulls in `order_id` | Pending |
-| Customer identifiers | Validate absence of nulls in `customer_id`; preserve for joins | Pending |
-| Missing timestamps | Preserve expected nulls; investigate inconsistent missing values | Pending |
-| Invalid dates | Detect parsing failures without silently losing original information | Pending |
-| Date chronology | Validate chronological consistency of order events | Pending |
-| Order statuses | Preserve original statuses; investigate inconsistencies | Pending |
+| Date columns stored as strings | Convert five date columns to datetime | Implemented |
+| Order identifiers | Validate uniqueness and absence of nulls in `order_id` | Implemented |
+| Customer identifiers | Validate absence of nulls in `customer_id`; preserve for joins | Implemented |
+| Missing timestamps | Preserve expected nulls; flag inconsistencies based on order status | Implemented |
+| Invalid dates | Detect parsing failures without silently losing original information | Implemented |
+| Date chronology | Check seven chronological conditions and flag suspicious records | Implemented |
+| Order statuses | Preserve original statuses and validate relevant timestamp requirements | Implemented |
+| Quality flags | Add `chronology_issue` and `status_timestamp_issue` | Implemented |
 
 **Implementation Progress**
-- Transformation: Pending
-- Validation: Pending
-- Unit tests: Pending
-- Silver Parquet output: Pending
-- Integration test: Pending
+- Transformation: Implemented
+- Validation: Implemented
+- Chronology checks: Implemented
+- Status-dependent timestamp checks: Implemented
+- Unit tests: Passing
+- Silver Parquet output: Generated
+- Pipeline execution: Successful
+- Automated end-to-end integration test: Pending
+
+**Data Quality Findings**
+
+A total of 99,441 orders were processed.
+
+**Chronology Issues**
+- 1,382 orders (1.39%) violate at least one chronological validation rule.
+- 1,359 orders have carrier handoff timestamps before payment approval.
+- 166 orders have carrier handoff timestamps before purchase.
+- 61 orders have customer delivery timestamps before payment approval.
+- 23 orders have customer delivery timestamps before carrier handoff.
+- Individual rule counts overlap because orders may violate multiple conditions.
+
+**Carrier Handoff Before Payment Approval**
+- Median discrepancy: 17.17 hours.
+- Mean discrepancy: 24.75 hours.
+- 178 orders have discrepancies greater than 48 hours.
+- Maximum discrepancy: approximately 171.2 days.
+
+**Status-Dependent Timestamp Issues**
+- Eight delivered orders have missing customer delivery timestamps.
+- One of these orders also has a missing carrier handoff timestamp.
+- No shipped orders were found with missing carrier handoff timestamps.
+
+**Cleaning Decisions**
+- Preserve all records with nonfatal chronology or status-timestamp issues.
+- Flag affected records instead of automatically removing them.
+- Do not modify inconsistent timestamps without supporting evidence.
+- Use quality flags when filtering data for Gold-layer analytics.
+- Keep the original order statuses unchanged.
+
+**Documentation**
+- Detailed findings: `docs/silver_data_quality.md`
+
+---
 
 ### 3. Order Items
 

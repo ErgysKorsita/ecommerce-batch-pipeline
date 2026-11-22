@@ -58,7 +58,6 @@ def validate_orders(df: pd.DataFrame)  -> None:
 def check_order_chronology(df: pd.DataFrame):
     df = df.copy()
 
-
     carrier_before_purchase = (
         df['order_delivered_carrier_date']
         < df['order_purchase_timestamp']
@@ -104,3 +103,24 @@ def check_order_chronology(df: pd.DataFrame):
         | estimated_before_purchase
     )
     return df
+
+def check_order_status_timestamps(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+
+    delivered_missing_timestamp = (
+        (df["order_status"] == "delivered") 
+        & (df["order_delivered_customer_date"].isna())
+    )
+    
+    shipped_missing_timestamp = (
+        (df["order_status"] == "shipped") 
+        & (df["order_delivered_carrier_date"].isna())
+    )
+    
+    df["status_timestamp_issue"] = (
+        delivered_missing_timestamp 
+        | shipped_missing_timestamp
+    )
+    
+    return df
+

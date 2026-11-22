@@ -8,3 +8,12 @@ def extract_customers(file_path: str | Path) -> pd.DataFrame:
     )
 
     return df
+
+def extract_csv(
+    file_path: str | Path,
+    dtype: dict | None = None
+) -> pd.DataFrame:
+
+    df = pd.read_csv(file_path, dtype=dtype)
+
+    return df

@@ -1,4 +1,3 @@
-from multiprocessing import Value
 import pandas as pd 
 import pytest 
 
@@ -12,20 +11,30 @@ def test_transform_orders_converts_dates():
         "order_approved_at": ["2018-05-11"],
         "order_delivered_carrier_date": ["2018-05-12"],
         "order_delivered_customer_date": ["2018-05-15"],
-        "order_estimated_delivery_date": ["2018-05-20"]
+        "order_estimated_delivery_date": ["2018-05-20"],
+        "order_status": ["delivered"]
     })
-
+    
+    date_columns = [
+    "order_purchase_timestamp",
+    "order_approved_at",
+    "order_delivered_carrier_date",
+    "order_delivered_customer_date",
+    "order_estimated_delivery_date"
+]
     cleaned_df = transform_orders(df)
 
-    for column in df.columns:
+    for column in date_columns:
         assert pd.api.types.is_datetime64_any_dtype(cleaned_df[column])
+
+    assert cleaned_df["order_status"].iloc[0] == "delivered"
 
 def test_transform_orders_invalid_dates():
     df = pd.DataFrame({
         'order_purchase_timestamp': ['invalid_date'], 
         'order_approved_at': ['2018-05-11'],
         'order_delivered_carrier_date': ['2018-05-12'],
-        'ordered_delivered_customer_date': ['2018-05-15'],
+        'order_delivered_customer_date': ['2018-05-15'],
         'order_estimated_delivery_date': ['2018-05-20']
     })
 
@@ -208,7 +217,7 @@ def test_chronology_preserves_original():
     result = check_order_chronology(df)
 
     assert "chronology_issue" not in df.columns
-    "chronology_issue" in result.columns
+    assert "chronology_issue" in result.columns
 
 def test_status_delivered_missing_timestamp():
     df = pd.DataFrame({
@@ -236,7 +245,6 @@ def test_status_canceled_missing_timestamp():
     df = pd.DataFrame({
         "order_status": ["canceled"],
         "order_delivered_customer_date": pd.to_datetime([None]),
-        "order_delivered_customer_date": pd.to_datetime([None]),
         "order_delivered_carrier_date": pd.to_datetime([None])
     })
 
@@ -248,7 +256,6 @@ def  test_status_shipped_missing_carrier_timestamp():
     df = pd.DataFrame({
         "order_status": ["shipped"],
         "order_delivered_carrier_date": pd.to_datetime([None]),
-        "order_delivered_customer_date": pd.to_datetime([None]),
         "order_delivered_customer_date": pd.to_datetime([None])
     })
 
@@ -278,3 +285,19 @@ def test_status_timestamps_preserves_original():
 
     assert "status_timestamp_issue" not in df.columns
     assert "status_timestamp_issue" in result.columns
+
+def test_transform_orders_quality_flags():
+
+    df = pd.DataFrame({
+        "order_purchase_timestamp": ["2018-05-10"],
+        "order_approved_at": ["2018-05-11"],
+        "order_delivered_carrier_date": ["2018-05-12"],
+        "order_delivered_customer_date": [None],
+        "order_estimated_delivery_date": ["2018-05-20"],
+        "order_status": ["delivered"]
+    })
+
+    result = transform_orders(df)
+
+    assert result["chronology_issue"].iloc[0] == False
+    assert result['status_timestamp_issue'].iloc[0] == True

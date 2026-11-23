@@ -42,7 +42,9 @@ def transform_orders(df: pd.DataFrame) -> pd.DataFrame:
             raise ValueError(
             f'Column {column}: {invalid_dates} invalid dates found'
         )
-    
+    df = check_order_chronology(df)
+    df = check_order_status_timestamps(df)
+
     return df
 
 def validate_orders(df: pd.DataFrame)  -> None:

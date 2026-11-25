@@ -151,7 +151,8 @@ def validate_order_items(df: pd.DataFrame) -> None:
         "product_id", 
         "seller_id", 
         "price", 
-        "freight_value"
+        "freight_value", 
+        "shipping_limit_date"
     ]
 
     if df.duplicated(subset = ["order_id", "order_item_id"]).any():

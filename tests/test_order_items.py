@@ -80,9 +80,10 @@ def test_validate_order_items_valid_composite_keys(valid_order_items_df):
     "order_id",
     "order_item_id",
     "product_id",
-    "seller_id", 
-    "price", 
-    "freight_value"
+    "seller_id",
+    "price",
+    "freight_value",
+    "shipping_limit_date"
 ])
 
 def test_valid_order_items_missing_identifiers(valid_order_items_df,column):

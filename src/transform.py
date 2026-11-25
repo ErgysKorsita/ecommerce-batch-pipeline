@@ -126,3 +126,51 @@ def check_order_status_timestamps(df: pd.DataFrame) -> pd.DataFrame:
     
     return df
 
+def transform_order_items(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+
+    column = "shipping_limit_date"
+
+    missing_before = df[column].isna().sum()
+    df[column] = pd.to_datetime(df[column], errors = "coerce")
+    missing_after = df[column].isna().sum()
+
+    invalid_dates = missing_after - missing_before
+
+    if invalid_dates > 0:
+        raise ValueError(
+            f"Column {column}:{invalid_dates} invalid dates found.")
+
+    return df 
+
+def validate_order_items(df: pd.DataFrame) -> None:
+
+    required_columns = [
+        "order_id",
+        "order_item_id",
+        "product_id", 
+        "seller_id", 
+        "price", 
+        "freight_value"
+    ]
+
+    if df.duplicated(subset = ["order_id", "order_item_id"]).any():
+        raise ValueError(
+            "Duplicate composite key (order_id, order_item_id) found!"
+        )
+    
+    for col in required_columns:
+        if df[col].isna().any():
+            raise ValueError(f"Missing values in {col}!")
+        
+    if (
+        (df["order_item_id"] <= 0 )
+        | (df["order_item_id"] % 1 != 0)
+    ).any():
+        raise ValueError("Invalid order_item_id")
+
+    if (df["price"] <= 0).any():
+        raise ValueError("Invalid price")
+    
+    if (df["freight_value"] < 0).any():
+        raise ValueError("Invalid freight_value")

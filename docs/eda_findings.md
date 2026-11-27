@@ -183,16 +183,31 @@ The main Silver-layer work includes:
 
 ## Silver-Layer Action Checklist
 
-- [ ] **Data types:** Convert Orders, Order Items, and Reviews date columns to timestamps.
-- [ ] **ZIP prefixes:** Verify source formatting and preserve five-character strings in Customers, Sellers, and Geolocation.
+- [x] **Data types:** Convert Orders date columns to timestamps.
+- [x] **Data types:** Convert Order Items shipping deadlines to timestamps.
+- [ ] **Data types:** Convert Reviews date columns to timestamps.
+- [x] **ZIP prefixes:** Preserve five-character strings in Customers.
+- [ ] **ZIP prefixes:** Preserve five-character strings in Sellers and Geolocation.
 - [ ] **Schema:** Correct the two misspelled `*_lenght` product column names.
-- [ ] **Keys and relationships:** Validate foreign keys, composite keys, and repeated review identifiers.
+- [x] **Keys:** Validate Order Items composite keys.
+- [x] **Relationships:** Validate Order Items references against Orders.
+- [ ] **Relationships:** Validate Order Items references against Products and Sellers.
+- [ ] **Relationships:** Validate remaining foreign key relationships.
+- [ ] **Reviews:** Investigate repeated review identifiers.
 - [ ] **Geolocation:** Create a unique ZIP-prefix lookup and investigate 42 out-of-bounds coordinates.
-- [ ] **Missing data:** Investigate missing order timestamps and product attributes.
+- [x] **Missing data:** Investigate missing order timestamps.
+- [ ] **Missing data:** Investigate missing product attributes.
 - [ ] **Payments:** Investigate undefined payment types, zero values, unusual payment sequences, and order-level totals.
 - [ ] **Categories:** Handle the two missing category translations.
-- [ ] **Business anomalies:** Investigate chronological inconsistencies, unusual freight charges, and relevant monetary outliers.
+- [x] **Business anomalies:** Investigate Orders chronological inconsistencies.
+- [x] **Business anomalies:** Investigate Order Items shipping deadline chronology.
+- [ ] **Business anomalies:** Investigate unusual freight charges and remaining monetary outliers.
 - [ ] **Verification:** Confirm the freight-outlier count and maximum payment value against the EDA notebook.
+- [x] **Silver output:** Generate and verify `customers.parquet`.
+- [x] **Silver output:** Generate and verify `orders.parquet`.
+- [x] **Silver output:** Generate and verify `order_items.parquet`.
+
+---
 
 ---
 

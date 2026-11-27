@@ -86,7 +86,7 @@ def test_validate_order_items_valid_composite_keys(valid_order_items_df):
     "shipping_limit_date"
 ])
 
-def test_valid_order_items_missing_identifiers(valid_order_items_df,column):
+def test_valid_order_items_missing_required_values(valid_order_items_df,column):
     valid_order_items_df.loc[0,column] =  None
     with pytest.raises(ValueError, match=f"Missing values in {column}"):
         validate_order_items(valid_order_items_df)
